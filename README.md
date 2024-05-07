@@ -1,13 +1,16 @@
 # Grimoire: Alpha 1.0
 
-Grimoire is a privacy-focused, free, and open-source front end designed specifically for our community. No downloads required! No data collection ever! Grimoire provides a sleek and intuitive interface for engaging in conversations with AI-powered characters using the Claude and GPT models.
+Grimoire is a privacy-focused, free, and open-source front end designed specifically for roleplayers. No downloads required! No data collection ever! Grimoire provides a sleek and intuitive interface for engaging in conversations with AI-powered characters using the Claude and GPT models.
+
+
+![banner](https://ttalesinteractive.com/grimoire/grimoireBan3.png)
 
 
 <p align="center">Local and private front end. Scaling AI chatbot tool Similar to OpenC and ST.</p>
 
 <p align="center"><b>⟶ <a href="https://ttalesinteractive.com/grimoire/alpha.html">Try the Alpha here!</a> ⟵</b></p>
 
-<p align="center"><a href="https://discord.gg/Tr8vvRUuCv">Discord Server</a></p>
+<p align="center"><a href="https://discord.gg/Tr8vvRUuCv">Join us on Discord</a></p>
 
 ## Current Features
 
@@ -98,9 +101,9 @@ Optional: Poke us on discord!
 5. Open a pull request
 
 ## License
-Grimoire is released under the [Grimoire License](https://github.com/ElodineOfficial/Grimoire/blob/main/LICENSE). Please note that while Grimoire is free and open-source for the community to enjoy and contribute to, it is not available for commercial use.
+Grimoire is released under this [License](https://github.com/ElodineOfficial/Grimoire/blob/main/LICENSE). Please note that while Grimoire is free and open-source for the community to enjoy and contribute to, it is not available for commercial use.
 
 ## Contact
-If you have any questions, suggestions, or feedback, please feel free to reach out to Elodine on [Grimoire Discord Server](https://discord.gg/Tr8vvRUuCv).
+If you have any questions, suggestions, or feedback, please feel free to reach out to Elodine on [Grimoire/TTI Discord Server](https://discord.gg/Tr8vvRUuCv).
 
-Happy chatting with Grimoire!
+Happy chatting!
