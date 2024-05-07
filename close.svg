@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 744.09447 1052.362179" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <filter id="a" x="-.18" y="-.18" width="1.36" height="1.36">
+   <feGaussianBlur stdDeviation="13.71429"/>
+  </filter>
+ </defs>
+ <path transform="translate(-52.142 36.525)" d="m268.57 149.51a91.429 91.429 0 1 1 -182.86 0 91.429 91.429 0 1 1 182.86 0z" fill="#fff" filter="url(#a)" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.6"/>
+ <path transform="translate(-54.142 34.525)" d="m268.57 149.51a91.429 91.429 0 1 1 -182.86 0 91.429 91.429 0 1 1 182.86 0z" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="29.8"/>
+ <path d="m86.559 147.59 72.884 72.884v-0.98491" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="28"/>
+ <path d="m159.44 147.59-72.884 72.884v-0.98491" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="28"/>
+</svg>

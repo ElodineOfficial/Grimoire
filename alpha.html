@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="/grimoire/styles.css">
+</head>
+<body>
+<div class="container">
+<div class="left-column">
+  <div class="sidebar-header">
+    <button id="toggleSidebar" class="btn">Collapse</button>
+  </div>
+  <div class="sidebar-content">
+    <button id="landingBtn" class="btn">Landing Page</button>
+    <button id="threadsBtn" class="btn">Chat Threads</button>
+    <button id="settingsBtn" class="btn">User Settings</button>
+    <div id="threadList"></div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="https://ttalesinteractive.com/?page_id=1984" target="_blank" class="about-btn">About</a>
+    <button id="purgeDataBtn" class="btn">Purge All Data</button>
+  </div>
+</div>
+
+<button id="expandSidebar" class="btn">Expand</button>
+    <div class="middle-column">
+        
+<!-- Landing Page -->
+<div id="landingPage" class="landing-page">
+  <h2 class="section-header">Your Characters</h2>
+  <div id="characterCardsContainer">
+    <!-- Character cards will be dynamically added here -->
+  </div>
+  <h2 class="section-header">Example Characters</h2>
+  <div id="exampleCharactersContainer">
+    <!-- Example character cards will be dynamically added here -->
+  </div>
+</div>
+
+        <!-- Current Chat -->
+        <div id="currentChat" class="current-chat">
+            <div id="chatMessages">
+                <div class="user-message">
+                    <img class="message-avatar" src="default-avatar.png" alt="user avatar">
+                    <div class="message-content">User message example</div>
+                </div>
+                <div class="ai-message">
+                    <img class="message-avatar" src="default-character-avatar.png" alt="character avatar">
+                    <div class="message-content">AI message example</div>
+                </div>
+            </div>
+            <div class="message-input">
+                <select id="modelSelect">
+                    <option value="claude">Claude</option>
+                    <option value="gpt">GPT</option>
+                </select>
+                <button id="modelSettingsBtn" class="btn">Model Settings</button>
+                <textarea id="messageInput" rows="1" placeholder="Type your message..."></textarea>
+                <button id="sendBtn" class="btn">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+            <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+    <h2>User Settings</h2>
+    <div id="userSettingsContent">
+      <h3>User Profile</h3>
+      <img id="userAvatar" src="default-avatar.png" alt="user avatar" style="width: 100px; height: 100px;">
+      <form id="avatarForm">
+        <label for="avatarInput">Select Avatar:</label>
+        <input type="file" id="avatarInput" accept="image/*">
+      </form>
+    </div>
+    <hr>
+    <h2>API Keys</h2>
+    <form id="apiKeyForm">
+      <label for="userName">User Name:</label>
+      <input type="text" id="userName" name="userName">
+      <label for="claudeKey">Claude API Key:</label>
+      <input type="text" id="claudeKey">
+      <label for="gptKey">GPT API Key:</label>
+      <input type="text" id="gptKey">
+      <button type="submit" class="btn">Save</button>
+    </form>
+  </div>
+</div>
+    <!-- Character Card Modal -->
+    <div id="characterModal" class="modal">
+        <div class="modal-content">
+            <h2>Create Character</h2>
+			            <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+            <form id="characterForm">
+                <label for="characterName">Character Name:</label>
+                <input type="text" id="characterName" required>
+                <label for="characterAvatar">Character Avatar:</label>
+                <input type="file" id="characterAvatar" accept="image/*">
+                <img id="characterAvatarPreview" src="default-character-avatar.png" alt="character avatar" style="width: 100px; height: 100px;">
+                <label for="characterInstruction">Instruction Message:</label>
+                <textarea id="characterInstruction" rows="4"></textarea>
+                <label for="characterReminder">Reminder Message:</label>
+                <textarea id="characterReminder" rows="4"></textarea>
+                <label for="characterInitialMessage">Initial Message:</label>
+                <textarea id="characterInitialMessage" rows="4"></textarea>
+                <button type="submit" class="btn">Create</button>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Character Card Modal -->
+    <div id="editCharacterModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Character</h2>
+            <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+            <form id="editCharacterForm">
+                <input type="hidden" id="editCharacterId">
+                <label for="editCharacterName">Character Name:</label>
+                <input type="text" id="editCharacterName" required>
+                <label for="editCharacterAvatar">Character Avatar:</label>
+                <input type="file" id="editCharacterAvatar" accept="image/*">
+                <img id="editCharacterAvatarPreview" src="" alt="character avatar" style="width: 100px; height: 100px;">
+                <label for="editCharacterInstruction">Instruction Message:</label>
+                <textarea id="editCharacterInstruction" rows="4"></textarea>
+                <label for="editCharacterReminder">Reminder Message:</label>
+                <textarea id="editCharacterReminder" rows="4"></textarea>
+                <label for="editCharacterInitialMessage">Initial Message:</label>
+                <textarea id="editCharacterInitialMessage" rows="4"></textarea>
+                <button type="submit" class="btn">Save</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+                        <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+    <!-- Model Settings Modal -->
+    <div id="modelSettingsModal" class="modal">
+        <div class="modal-content">
+                        <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+            <h2>Model Settings</h2>
+            <select id="presetSelect">
+                <option value="">Select a preset</option>
+                <!-- Preset options will be dynamically added here -->
+            </select>
+            <button id="savePresetBtn" class="btn">Save as Preset</button>
+            <form id="modelSettingsForm">
+                <!-- Input fields will be dynamically added here -->
+                <button type="submit" class="btn">Save</button>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Message Modal -->
+    <div id="editMessageModal" class="modal">
+        <div class="modal-content">
+                       <span class="close">
+  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+</span>
+            <h2>Edit Message</h2>
+            <form id="editMessageForm">
+                <input type="hidden" id="editMessageId">
+                <label for="editMessageContent">Message Content:</label>
+                <textarea id="editMessageContent" required></textarea>
+                <button type="submit" class="btn">Save</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script type="module" src="/grimoire/app.js"></script>
+    <script type="module" src="/grimoire/models.js"></script>
+    <script type="module" src="/grimoire/modelSettings.js"></script>
+</body>
+</html>
