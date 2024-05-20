@@ -75,7 +75,43 @@ claude: {
       ];
     },
   },
-  // Add more models here
+ cohere: {
+    endpoint: 'https://api.cohere.ai/v1/chat',
+    apiKeyField: 'Authorization',
+    apiKeyPrefix: 'Bearer ',
+    messageField: 'message',
+    requestBody: {
+      model: 'command-r-plus',
+      max_tokens: 250,
+      temperature: 0.7,
+    },
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+    },
+    extractResponseContent: (data) => {
+      if (data.generations && data.generations.length > 0) {
+        return data.generations[0].text;
+      }
+      return null;
+    },
+formatConversationHistory: (conversationHistory) => {
+  const cleanMessage = (message) => {
+    return message.replace(/^\d+\n\n/, '').replace(/\n\n\d+$/, '').replace(/\n/g, ' ').trim();
+  };
+
+  const formattedHistory = conversationHistory.map((message) => ({
+    role: message.role === 'user' ? 'USER' : 'CHATBOT',
+    message: cleanMessage(message.content),
+  }));
+
+  return {
+    chat_history: formattedHistory,
+    message: cleanMessage(conversationHistory[conversationHistory.length - 1].content),
+    connectors: [{ id: 'web-search' }],
+  };
+},
+  },
 };
 
 export default models;
