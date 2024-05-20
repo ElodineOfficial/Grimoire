@@ -438,6 +438,29 @@ function adjustTextareaHeight() {
 // Event listener for input event on the textarea
 document.querySelector("#messageInput").addEventListener("input", adjustTextareaHeight);
 
+// Utility function to calculate word count
+function getWordCount(text) {
+  return text.trim().split(/\s+/).length;
+}
+
+// Function to trim conversation history based on context limit
+function trimConversationHistory(conversationHistory, contextLimit) {
+  let totalWords = 0;
+  let trimmedHistory = [];
+
+  for (let i = conversationHistory.length - 1; i >= 0; i--) {
+    const message = conversationHistory[i];
+    const wordCount = getWordCount(message.content);
+    if (totalWords + wordCount > contextLimit) {
+      break;
+    }
+    trimmedHistory.unshift(message);
+    totalWords += wordCount;
+  }
+
+  return trimmedHistory;
+}
+
 function sendMessageToAPI(model, content) {
   db.settings
     .get(1)
@@ -489,7 +512,13 @@ function sendMessageToAPI(model, content) {
                       if (selectedModel) {
                         const endpoint = selectedModel.endpoint;
                         const apiKeyField = selectedModel.apiKeyField;
-                        const conversationHistoryFormatted = selectedModel.formatConversationHistory(conversationHistory, character.name);
+
+                        // Retrieve the context limit based on the model
+                        const contextLimit = selectedModel.contextLimits[selectedModel.requestBody.model];
+                        // Trim the conversation history to fit within the context limit
+                        const trimmedHistory = trimConversationHistory(conversationHistory, contextLimit);
+
+                        const conversationHistoryFormatted = selectedModel.formatConversationHistory(trimmedHistory, character.name);
 
                         // Create a copy of the requestBody
                         const requestBody = { ...selectedModel.requestBody };
@@ -514,7 +543,7 @@ function sendMessageToAPI(model, content) {
 
                         const timeout = setTimeout(() => {
                           console.error("API request timed out after 60 seconds.");
-                          showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
+                          showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
                         }, 60000); // 60 seconds timeout
 
 console.log("Complete Request Details for " + model.toUpperCase() + ":", {
@@ -542,7 +571,7 @@ console.log("Complete Request Details for " + model.toUpperCase() + ":", {
 
   if (data.type === "error") {
     console.error("Error response from " + model.toUpperCase() + " API:", data);
-    showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
+    showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
   } else {
     const responseContent = model === 'cohere' ? data.text : selectedModel.extractResponseContent(data);
     if (responseContent) {
@@ -580,7 +609,7 @@ console.log("Complete Request Details for " + model.toUpperCase() + ":", {
                                 " API:",
                               error
                             );
-                            showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
+                            showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
                           });
                       } else {
                         console.error("Unsupported model:", model);
@@ -619,21 +648,70 @@ console.log("Complete Request Details for " + model.toUpperCase() + ":", {
   smoothScrollToBottom();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Close button functionality for error modal
+    const errorModalCloseBtn = document.querySelector('#errorModal .close');
+    if (errorModalCloseBtn) {
+        errorModalCloseBtn.addEventListener('click', hideErrorModal);
+    }
+});
 
+// Capture the latest console error
+let latestConsoleError = '';
 
-// Function to show the error modal
+(function() {
+  const originalError = console.error;
+  console.error = function(...args) {
+    latestConsoleError = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+    ).join(' '); // Serialize objects to get full context
+    originalError.apply(console, args);
+  };
+})();
+
+// Function to show the error modal with error message and latest console error
 function showErrorModal(errorMessage) {
   const errorModal = document.getElementById("errorModal");
   const errorMessageElement = document.getElementById("errorMessage");
+  const errorLogsElement = document.getElementById("errorLogs");
+
+  // Display the error message
   errorMessageElement.textContent = errorMessage;
+
+  // Display the latest console error
+  errorLogsElement.textContent = latestConsoleError;
+
   errorModal.style.display = "block";
 }
 
 // Function to hide the error modal
 function hideErrorModal() {
-    const errorModal = document.getElementById("errorModal");
-    errorModal.style.display = "none";
+  const errorModal = document.getElementById("errorModal");
+  errorModal.style.display = "none";
 }
+
+// Function to copy error logs to clipboard
+function copyErrorLogs() {
+  const errorMessageElement = document.getElementById("errorMessage").textContent;
+  const errorLogsElement = document.getElementById("errorLogs").textContent;
+  const combinedMessage = `${errorMessageElement}\n\nConsole Logs:\n${errorLogsElement}`;
+  
+  const tempTextArea = document.createElement("textarea");
+  tempTextArea.value = combinedMessage;
+  document.body.appendChild(tempTextArea);
+  tempTextArea.select();
+  document.execCommand("copy");
+  document.body.removeChild(tempTextArea);
+
+  alert("Error details copied to clipboard!");
+}
+
+// Attach the function to the window object to make it globally accessible
+window.hideErrorModal = hideErrorModal;
+window.copyErrorLogs = copyErrorLogs;
+
+
+
 
 // Attach the function to the window object to make it globally accessible
 window.hideErrorModal = hideErrorModal;
@@ -905,10 +983,10 @@ function displayMessagesForThread(threadId) {
                       // Clear the existing messages in the chat feed
                       chatMessages.innerHTML = "";
 
-                      // Display the initial AI character message
-                      const initialMessageElement = document.createElement("div");
-                      initialMessageElement.classList.add("ai-message");
-                      initialMessageElement.dataset.messageId = "initial";
+                        // Display the initial AI character message
+  const initialMessageElement = document.createElement("div");
+  initialMessageElement.classList.add("ai-message");
+  initialMessageElement.dataset.messageId = "initial";
 
                       const avatarElement = document.createElement("img");
                       avatarElement.classList.add("message-avatar");
@@ -929,12 +1007,18 @@ function displayMessagesForThread(threadId) {
                       const actionButtons = document.createElement("div");
                       actionButtons.classList.add("message-action-buttons");
 
-                      const editButton = document.createElement("button");
-                      editButton.classList.add("edit-message-btn");
-                      editButton.textContent = "Edit";
-                      actionButtons.appendChild(editButton);
+                        // Render the edit button for the initial message
+  const editButton = document.createElement("button");
+  editButton.classList.add("edit-message-btn");
+  editButton.textContent = "Edit";
+  editButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    showEditMessageModal("initial");
+  });
+  actionButtons.appendChild(editButton);
 
-                      messageHeader.appendChild(actionButtons);
+  messageHeader.appendChild(actionButtons);
+                      
 
                       const messageContent = document.createElement("div");
                       messageContent.classList.add("message-content");
@@ -1074,15 +1158,42 @@ function showEditMessageModal(messageId) {
   const editMessageId = document.getElementById('editMessageId');
   const editMessageContent = document.getElementById('editMessageContent');
 
-  db.messages.get(Number(messageId))
-    .then((message) => {
-      editMessageId.value = message.id;
-      editMessageContent.value = message.content;
-      editMessageModal.style.display = 'block';
-    })
-    .catch((error) => {
-      console.error('Error retrieving message:', error);
-    });
+  // Check if messageId is "initial"
+  if (messageId === "initial") {
+    // Retrieve the initial message content from the character's initialMessage field
+    db.threads
+      .get(getCurrentThreadId())
+      .then((thread) => {
+        if (thread && thread.characterId) {
+          db.characters
+            .get(thread.characterId)
+            .then((character) => {
+              if (character) {
+                editMessageId.value = "initial";
+                editMessageContent.value = character.initialMessage;
+                editMessageModal.style.display = 'block';
+              }
+            });
+        }
+      });
+  } else {
+    // Handle editing regular messages
+    db.messages.get(Number(messageId))
+      .then((message) => {
+        if (message) {
+          editMessageId.value = message.id;
+          editMessageContent.value = message.content;
+          editMessageModal.style.display = 'block';
+        } else {
+          console.warn('Message not found with ID:', messageId);
+          // You can choose to display an error message to the user or handle it silently
+        }
+      })
+      .catch((error) => {
+        console.error('Error retrieving message:', error);
+        // You can choose to display an error message to the user or handle it silently
+      });
+  }
 
   editMessageForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -1103,18 +1214,41 @@ function hideEditMessageModal() {
 }
 
 function updateMessage(messageId, messageContent) {
-  db.messages.get(Number(messageId))
-    .then((message) => {
-      message.content = messageContent;
-      return db.messages.put(message);
-    })
-    .then(() => {
-      document.getElementById('editMessageModal').style.display = 'none';
-      displayMessages(getCurrentThreadId());
-    })
-    .catch((error) => {
-      console.error('Error updating message:', error);
-    });
+  if (messageId === "initial") {
+    // Update the character's initialMessage field in the database
+    db.threads
+      .get(getCurrentThreadId())
+      .then((thread) => {
+        if (thread && thread.characterId) {
+          db.characters
+            .get(thread.characterId)
+            .then((character) => {
+              if (character) {
+                character.initialMessage = messageContent;
+                return db.characters.put(character);
+              }
+            })
+            .then(() => {
+              document.getElementById('editMessageModal').style.display = 'none';
+              displayMessagesForThread(getCurrentThreadId());
+            });
+        }
+      });
+  } else {
+    // Handle updating regular messages
+    db.messages.get(Number(messageId))
+      .then((message) => {
+        message.content = messageContent;
+        return db.messages.put(message);
+      })
+      .then(() => {
+        document.getElementById('editMessageModal').style.display = 'none';
+        displayMessages(getCurrentThreadId());
+      })
+      .catch((error) => {
+        console.error('Error updating message:', error);
+      });
+  }
 }
 
 function editMessage(messageId) {
