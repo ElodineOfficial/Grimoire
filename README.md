@@ -26,7 +26,7 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 
 ### Chat Functionality
 - Initiate chat threads with selected characters
-- Dynamic responses generated using Claude and GPT models
+- Dynamic responses generated using Claude, GPT, and Cohere models
 - Secure storage of chat history in the database
 - Edit, delete, and reroll messages within the chat
 
