@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Grimoire AI</title>
+    <title>Chat Application</title>
     <link rel="stylesheet" href="/grimoire/styles.css">
 </head>
 <body>
@@ -53,6 +53,7 @@
                 <select id="modelSelect">
                     <option value="claude">Claude</option>
                     <option value="gpt">GPT</option>
+					<option value="cohere">Cohere</option>
                 </select>
                 <button id="modelSettingsBtn" class="btn">Model Settings</button>
                 <textarea id="messageInput" rows="1" placeholder="Type your message..."></textarea>
@@ -89,6 +90,8 @@
       <input type="text" id="claudeKey">
       <label for="gptKey">GPT API Key:</label>
       <input type="text" id="gptKey">
+	  <label for="cohereKey">Cohere API Key:</label>
+	  <input type="text" id="cohereKey">
       <button type="submit" class="btn">Save</button>
     </form>
   </div>
