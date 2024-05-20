@@ -1,6 +1,6 @@
 # Grimoire: Alpha 1.0
 
-Grimoire is a privacy-focused, free, and open-source front end designed specifically for roleplayers. No downloads required! No data collection ever! Grimoire provides a sleek and intuitive interface for engaging in conversations with AI-powered characters using the Claude and GPT models.
+Grimoire is a privacy-focused, free, and open-source front end designed specifically for roleplayers. No downloads required! No data collection ever! Grimoire provides a sleek and intuitive interface for engaging in conversations with AI-powered characters using Claude, GPT, and Cohere / Command R Plus.
 
 
 ![banner](https://ttalesinteractive.com/grimoire/grimoireBan3.png)
@@ -36,7 +36,7 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 - Delete threads with a single click
 
 ### Settings and Customization
-- Enter API keys for Claude and GPT models
+- Enter API keys for Claude, GPT, and Cohere models
 - Modify username and upload custom avatar
 - Fine-tune model settings for personalized conversations
 
