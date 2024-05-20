@@ -868,3 +868,42 @@ blockquote {
   padding-left: 10px;
   margin: 10px 0;
 }
+
+.error-logs {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+#copyErrorBtn {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #444; /* Dark grey background */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#copyErrorBtn:hover {
+  background: #0056b3;
+}
+
+.error-logs {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  background: #222; /* Darker grey background */
+  border: 1px solid #555; /* Dark grey border */
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  color: #ddd; /* Light grey text */
+}
