@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Chat Application</title>
-    <link rel="stylesheet" href="/grimoire/styles.css">
+    <link rel="stylesheet" href="/grimoire/styles217.css">
 </head>
 <body>
 <div class="container">
@@ -150,17 +150,20 @@
         </div>
     </div>
     
-    <div id="errorModal" class="modal">
-        <div class="modal-content">
-                        <span class="close">
-  <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-</span>
-            <p id="errorMessage"></p>
-        </div>
-    </div>
+<div id="errorModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="hideErrorModal()">
+      <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </span>
+    <p id="errorMessage"></p>
+    <div id="errorLogs" class="error-logs"></div>
+    <button id="copyErrorBtn" onclick="copyErrorLogs()">Copy Error</button>
+  </div>
+</div>
+
     <!-- Model Settings Modal -->
     <div id="modelSettingsModal" class="modal">
         <div class="modal-content">
