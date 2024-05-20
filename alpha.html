@@ -9,6 +9,7 @@
 <div class="left-column">
   <div class="sidebar-header">
     <button id="toggleSidebar" class="btn">Collapse</button>
+    <button id="newsBtn" class="btn">News</button> <!-- Added News button -->
   </div>
   <div class="sidebar-content">
     <button id="landingBtn" class="btn">Landing Page</button>
@@ -62,6 +63,33 @@
         </div>
     </div>
 </div>
+
+<!-- News Modal -->
+<div id="newsModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeNewsModal()">
+      <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </span>
+    <h2>Latest News</h2>
+    <h2>Current Patch: 1.2</h2>
+    <div id="newsContent">
+      <p id="welcomeMessage">Welcome to Grimoire! Here you can find the latest news and updates. Thanks for joining us, this'll look better and better as time goes on! - Eli</p>
+      <select id="newsSelect" onchange="loadNewsContent()">
+        <option value="current">1.2</option>
+        <option value="upcoming">Upcoming Changes</option>
+        <option value="prioronedotone">1.1</option>
+        <option value="initialonedot">1.0</option>
+      </select>
+      <div id="newsDetails">
+        <!-- News details will be dynamically added here -->
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Settings Modal -->
 <div id="settingsModal" class="modal">
@@ -207,5 +235,6 @@
     <script type="module" src="/grimoire/app.js"></script>
     <script type="module" src="/grimoire/models.js"></script>
     <script type="module" src="/grimoire/modelSettings.js"></script>
+    <script type="module" src="/grimoire/news.js"></script> <!-- Added news.js script -->
 </body>
 </html>
