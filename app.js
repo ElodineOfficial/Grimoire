@@ -342,6 +342,7 @@ function saveApiKeys(event) {
   event.preventDefault();
   const claudeKey = document.getElementById("claudeKey").value;
   const gptKey = document.getElementById("gptKey").value;
+  const cohereKey = document.getElementById("cohereKey").value;
   const userName = document.getElementById("userName").value;
 
   console.log(
@@ -370,12 +371,12 @@ function saveApiKeys(event) {
       saveSettings(claudeKey, gptKey, userName, null);
     };
   } else {
-    saveSettings(claudeKey, gptKey, userName, null);
+    saveSettings(claudeKey, gptKey, cohereKey, userName, null);
   }
 }
-function saveSettings(claudeKey, gptKey, userName, avatarData) {
+function saveSettings(claudeKey, gptKey, cohereKey, userName, avatarData) {
   const id = 1;
-  const settings = { id, claudeKey, gptKey, userName };
+  const settings = { id, claudeKey, gptKey, cohereKey, userName };
 
   if (avatarData) {
     settings.avatar = avatarData;
@@ -484,41 +485,31 @@ function sendMessageToAPI(model, content) {
                       });
                       console.log("Conversation history:", conversationHistory);
 
-  const selectedModel = models[model];
-  if (selectedModel) {
-    const endpoint = selectedModel.endpoint;
-    const apiKeyField = selectedModel.apiKeyField;
-    const messageField = selectedModel.messageField;
-    const conversationHistoryFormatted =
-      selectedModel.formatConversationHistory(
-        conversationHistory,
-        character.name
-      );
+ const selectedModel = models[model];
+                      if (selectedModel) {
+                        const endpoint = selectedModel.endpoint;
+                        const apiKeyField = selectedModel.apiKeyField;
+                        const conversationHistoryFormatted = selectedModel.formatConversationHistory(conversationHistory, character.name);
 
-    // Create a copy of the requestBody
-    const requestBody = { ...selectedModel.requestBody };
+                        // Create a copy of the requestBody
+                        const requestBody = { ...selectedModel.requestBody };
 
-    // Set the messageField in the requestBody
-    requestBody[messageField] = conversationHistoryFormatted;
+                        // Set the messageField in the requestBody based on the model
+                        if (model === 'claude') {
+                          requestBody['prompt'] = conversationHistoryFormatted; // Assuming conversationHistoryFormatted is the prompt
+                        } else if (model === 'gpt') {
+                          requestBody['messages'] = conversationHistoryFormatted;
+                        } else if (model === 'cohere') {
+                          requestBody['message'] = conversationHistoryFormatted.message;
+                          requestBody['chat_history'] = conversationHistoryFormatted.chat_history;
+                          requestBody['connectors'] = conversationHistoryFormatted.connectors;
+                        }
 
-    // Exclude fields with NaN values from the requestBody, except for the messageField and model
-    Object.keys(requestBody).forEach(key => {
-      if (key !== messageField && key !== 'model' && isNaN(requestBody[key])) {
-        delete requestBody[key];
-      }
-    });
-    
-    
                         // Log the request details
-                        console.log(
-                          "Request Details for " + model.toUpperCase() + ":"
-                        );
+                        console.log("Request Details for " + model.toUpperCase() + ":");
                         console.log("Endpoint:", endpoint);
                         console.log("API Key Field:", apiKeyField);
-                        console.log(
-                          "API Key:",
-                          selectedModel.apiKeyPrefix + apiKey
-                        );
+                        console.log("API Key:", selectedModel.apiKeyPrefix + apiKey);
                         console.log("Request Body:", requestBody);
 
                         const timeout = setTimeout(() => {
@@ -526,6 +517,11 @@ function sendMessageToAPI(model, content) {
                           showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
                         }, 60000); // 60 seconds timeout
 
+console.log("Complete Request Details for " + model.toUpperCase() + ":", {
+  endpoint: endpoint,
+  apiKey: selectedModel.apiKeyPrefix + apiKey,
+  requestBody: requestBody,
+});
                         fetch(endpoint, {
                           method: "POST",
                           headers: {
@@ -541,52 +537,42 @@ function sendMessageToAPI(model, content) {
                             }
                             return response.json();
                           })
-                          .then((data) => {
-                            console.log(
-                              model.toUpperCase() + " API response:",
-                              data
-                            );
+                        .then((data) => {
+  console.log(model.toUpperCase() + " API response:", data);
 
-                            if (data.type === "error") {
-                              console.error(
-                                "Error response from " +
-                                  model.toUpperCase() +
-                                  " API:",
-                                data
-                              );
-                              showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
-                            } else {
-                              const responseContent =
-                                selectedModel.extractResponseContent(data);
-                              if (responseContent) {
-                                const timestamp = new Date().toISOString();
-                                conversationHistory.push({
-                                  role: "assistant",
-                                  content: responseContent,
-                                });
-                                console.log(
-                                  "Updated conversation history:",
-                                  conversationHistory
-                                );
+  if (data.type === "error") {
+    console.error("Error response from " + model.toUpperCase() + " API:", data);
+    showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send a report to Eli on Discord.");
+  } else {
+    const responseContent = model === 'cohere' ? data.text : selectedModel.extractResponseContent(data);
+    if (responseContent) {
+      const timestamp = new Date().toISOString();
+      conversationHistory.push({
+        role: "assistant",
+        content: responseContent,
+      });
+      console.log("Updated conversation history:", conversationHistory);
 
-                                db.threads
-                                  .update(getCurrentThreadId(), { conversationHistory }) // Store the updated conversation history back to the thread
-                                  .then(() => {
-                                    db.messages
-                                      .add({
-                                        content: responseContent,
-                                        timestamp,
-                                        model,
-                                        threadId: getCurrentThreadId(),
-                                        type: "ai",
-                                      })
-                                      .then(() => {
-                                        displayMessages(getCurrentThreadId());
-                                      });
-                                  });
-                              }
-                            }
-                          })
+      db.threads
+        .update(getCurrentThreadId(), { conversationHistory }) // Store the updated conversation history back to the thread
+        .then(() => {
+          db.messages
+            .add({
+              content: responseContent,
+              timestamp,
+              model,
+              threadId: getCurrentThreadId(),
+              type: "ai",
+            })
+            .then(() => {
+              displayMessages(getCurrentThreadId());
+            });
+        });
+    }
+  }
+})
+
+
                           .catch((error) => {
                             console.error(
                               "Error sending message to " +
@@ -843,8 +829,8 @@ function updateModelSettings(modelName, settings) {
       }
     }
 
-    // Update the model's requestBody with parsed settings, excluding null and NaN values
-    model.requestBody = { ...model.requestBody, ...parsedSettings };
+    // Update only the specific fields in the model's requestBody
+    Object.assign(model.requestBody, parsedSettings);
     console.log(`Updated ${modelName} model settings in requestBody:`, model.requestBody);
 
     // Save the parsed settings to the database, excluding null and NaN values
