@@ -18,6 +18,7 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 - Intuitive navigation between landing page, current chat, and settings
 - Collapsible left sidebar for optimal screen space utilization
 - Responsive design for seamless experience on mobile and desktop devices
+- Entirely customizable through an appearance tab
 
 ### Character Management
 - Create new characters with detailed information (name, instructions, reminders, initial messages, avatar)
