@@ -76,8 +76,9 @@
     <h2>Latest News</h2>
     <h2>Current Patch: 1.2</h2>
     <div id="newsContent">
-      <p id="welcomeMessage">Welcome to Grimoire! Here you can find the latest news and updates. Thanks for joining us, this'll look better and better as time goes on! - Eli</p>
-      <select id="newsSelect" onchange="loadNewsContent()">
+	   <p id="stickyMessage">Hotfix: Cohere is working again. The auto scrolling bug has been fixed.</p>
+       <p id="welcomeMessage">Welcome to Grimoire! Here you can find the latest news and updates. Thanks for joining us, this'll look better and better as time goes on! - Eli</p>
+        <select id="newsSelect" onchange="loadNewsContent()">
         <option value="current">1.2</option>
         <option value="upcoming">Upcoming Changes</option>
         <option value="prioronedotone">1.1</option>
@@ -232,6 +233,7 @@
         </div>
     </div>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.polyfills.min.js"></script>
     <script type="module" src="/grimoire/app.js"></script>
     <script type="module" src="/grimoire/models.js"></script>
     <script type="module" src="/grimoire/modelSettings.js"></script>
