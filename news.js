@@ -19,7 +19,6 @@ const newsContent = {
 	    upcoming: `
         <h3>Upcoming Changes</h3>
         <ul>
-            <li>Fix auto scroll bug.</li>
             <li>Add visual customization panel.</li>
 			<li>Long term memory.</li>
             <li>More model support.</li>            
@@ -32,6 +31,8 @@ const newsContent = {
     current: `
         <h3> 1.2: Current Patch Notes</h3>
         <ul>
+			<li>Fixed scrolling bug.</li>
+			<li>Fixed an issue where Cohere would not send messages.</li>
             <li>Added  news panel.</li>
             <li>Added patch notes.</li>
         </ul>
