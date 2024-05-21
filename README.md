@@ -1,4 +1,4 @@
-# Grimoire: Alpha 1.2
+# Grimoire: Alpha 1.3
 
 Grimoire is a privacy-focused, free, and open-source front end designed specifically for roleplayers. No downloads required! No data collection ever! Grimoire provides a sleek and intuitive interface for engaging in conversations with AI-powered characters using Claude, GPT, and Cohere / Command R Plus.
 
@@ -87,6 +87,22 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 
 ## Changelog
 
+### [1.3] - 2024-05-21
+#### Added
+- Added appearance tab
+- Supports editing of all visual fields of the site
+- Added import function for site appearance
+- Added export function for site appearance
+- Added ability to reset the site appearance
+
+### [1.2] - 2024-05-20
+#### Added
+- News panel
+- Prior patch notes added to news panel
+- Upcoming patch notes added to news panel
+- Cohere connection bug fixed
+- Autoscroll function fixed
+
 ### [1.1] - 2024-05-20
 #### Added
 - Support for Cohere
@@ -94,12 +110,6 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 - Fixed a bug where the error popup wouldn't close
 - Added better error handling so users can see exactly why their request might be rejected
 - Fixed a bug where users couldn't edit their initial message
-
-### [1.2] - 2024-05-20
-#### Added
-- News panel
-- Prior patch notes added to news panel
-- Upcoming patch notes added to news panel
 
 #### Fixed
 - Minor bug fixes and performance improvements
