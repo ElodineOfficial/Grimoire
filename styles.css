@@ -646,7 +646,6 @@ body {
   color: #ffffff;
 }
 
-/* Chat messages styles */
 #chatMessages {
   flex-grow: 1;
   overflow-y: auto;
@@ -655,7 +654,10 @@ body {
   display: flex;
   flex-direction: column;
   font-size: var(--font-size-secondary);
+  max-height: calc(100vh - 160px); /* Ensuring it doesn't exceed the viewport */
 }
+
+
 
 .user-message {
   display: flex;
