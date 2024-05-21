@@ -29,7 +29,16 @@ const newsContent = {
         </ul>
     `,
     current: `
-        <h3> 1.2: Current Patch Notes</h3>
+        <h3> 1.3: Current Patch Notes</h3>
+        <ul>
+			<li>Appearance tab added.</li>
+			<li>Import function for appearance tab added.</li>
+            <li>Export function for appearance tab added</li>
+            <li>Clear visual data button added.</li>
+        </ul>
+    `,
+	    prioronedottwo: `
+        <h3> 1.2: News Udpdate</h3>
         <ul>
 			<li>Fixed scrolling bug.</li>
 			<li>Fixed an issue where Cohere would not send messages.</li>
