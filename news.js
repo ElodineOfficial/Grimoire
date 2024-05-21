@@ -19,7 +19,6 @@ const newsContent = {
 	    upcoming: `
         <h3>Upcoming Changes</h3>
         <ul>
-            <li>Add visual customization panel.</li>
 			<li>Long term memory.</li>
             <li>More model support.</li>            
 			<li>Fix integer bug on null Claude values.</li>
@@ -32,6 +31,7 @@ const newsContent = {
         <h3> 1.3: Current Patch Notes</h3>
         <ul>
 			<li>Appearance tab added.</li>
+			<li>Edit any visual value of the entire application.</li>
 			<li>Import function for appearance tab added.</li>
             <li>Export function for appearance tab added</li>
             <li>Clear visual data button added.</li>
