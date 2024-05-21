@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Chat Application</title>
-    <link rel="stylesheet" href="/grimoire/styles.css">
+    <link rel="stylesheet" href="/grimoire/styles221.css">
 </head>
 <body>
 <div class="container">
@@ -19,6 +19,7 @@
   </div>
   <div class="sidebar-footer">
     <a href="https://ttalesinteractive.com/?page_id=1984" target="_blank" class="about-btn">About</a>
+	<button id="appearanceBtn" class="btn">Appearance</button>
     <button id="purgeDataBtn" class="btn">Purge All Data</button>
   </div>
 </div>
@@ -63,6 +64,32 @@
         </div>
     </div>
 </div>
+
+
+<!-- Appearance Modal -->
+<div id="appearanceModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">
+            <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </span>
+        <h2>Appearance Settings</h2>
+        <form id="appearanceForm">
+            <label for="cssClassSelect">Select CSS Class:</label>
+            <select id="cssClassSelect"></select>
+            <div id="cssProperties"></div>
+            <button type="button" id="saveCssButton" class="btn">Save</button>
+        </form>
+        <button id="exportCssButton" class="btn">Export CSS Profile</button>
+        <input type="file" id="importCssInput" class="btn" style="display: none;">
+        <label for="importCssInput" class="btn">Import CSS Profile</label>
+        <button id="clearCssButton" class="btn">Clear Settings</button> <!-- Added Clear Settings button -->
+    </div>
+</div>
+
+
 
 <!-- News Modal -->
 <div id="newsModal" class="modal">
@@ -234,9 +261,10 @@
     </div>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.polyfills.min.js"></script>
-    <script type="module" src="/grimoire/app.js"></script>
-    <script type="module" src="/grimoire/models.js"></script>
-    <script type="module" src="/grimoire/modelSettings.js"></script>
-    <script type="module" src="/grimoire/news.js"></script> <!-- Added news.js script -->
+    <script type="module" src="/grimoire/app613.js"></script>
+    <script type="module" src="/grimoire/models96.js"></script>
+    <script type="module" src="/grimoire/modelSettings18.js"></script>
+    <script type="module" src="/grimoire/news10.js"></script> <!-- Added news.js script -->
+	<script type="module" src="/grimoire/appearance13.js"></script>
 </body>
 </html>
