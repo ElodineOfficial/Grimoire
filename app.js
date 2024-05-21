@@ -51,6 +51,35 @@ db.version(95).stores({
 });
 window.db = db;
 
+// Set up MutationObserver to monitor changes in the #chatMessages container
+const chatMessagesObserver = new MutationObserver((mutations) => {
+  console.log("MutationObserver triggered"); // Log when observer is triggered
+
+  mutations.forEach((mutation) => {
+    console.log("Mutation type:", mutation.type); // Log mutation type
+    if (mutation.type === 'childList' || mutation.type === 'subtree') {
+      const chatMessagesContainer = document.getElementById('chatMessages');
+
+      // Scroll to the bottom of the container
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+
+      console.log("Scrolled to bottom:", chatMessagesContainer.scrollTop, chatMessagesContainer.scrollHeight); // Log scroll action
+    }
+  });
+});
+
+// Start observing the #chatMessages container
+const chatMessagesContainer = document.getElementById('chatMessages');
+if (chatMessagesContainer) {
+  console.log("#chatMessages element found, starting observer"); // Log if the element is found
+  chatMessagesObserver.observe(chatMessagesContainer, {
+    childList: true,
+    subtree: true,
+  });
+} else {
+  console.error("#chatMessages element not found, observer not started"); // Log if the element is not found
+}
+
 // Event listeners
 landingBtn.addEventListener("click", showLandingPage);
 settingsBtn.addEventListener("click", showUserSettings);
@@ -394,6 +423,61 @@ function saveSettings(claudeKey, gptKey, cohereKey, userName, avatarData) {
     });
 }
 
+function appendMessage(content, type, senderName, senderAvatar) {
+  const messageElement = document.createElement("div");
+  messageElement.classList.add(type === "user" ? "user-message" : "ai-message");
+
+  const avatarElement = document.createElement("img");
+  avatarElement.classList.add("message-avatar");
+  avatarElement.src = senderAvatar;
+  avatarElement.alt = type === "user" ? "user avatar" : "character avatar";
+  messageElement.appendChild(avatarElement);
+
+  const messageContentWrapper = document.createElement("div");
+  messageContentWrapper.classList.add("message-content-wrapper");
+
+  const messageHeader = document.createElement("div");
+  messageHeader.classList.add("message-header");
+
+  const senderNameElement = document.createElement("strong");
+  senderNameElement.textContent = senderName;
+  messageHeader.appendChild(senderNameElement);
+
+  const actionButtons = document.createElement("div");
+  actionButtons.classList.add("message-action-buttons");
+
+  const editButton = document.createElement("button");
+  editButton.classList.add("edit-message-btn");
+  editButton.textContent = "Edit";
+  actionButtons.appendChild(editButton);
+
+  const deleteButton = document.createElement("button");
+  deleteButton.classList.add("delete-message-btn");
+  deleteButton.textContent = "Delete";
+  actionButtons.appendChild(deleteButton);
+
+  if (type === "ai") {
+    const rerollButton = document.createElement("button");
+    rerollButton.classList.add("reroll-message-btn");
+    rerollButton.textContent = "Reroll";
+    actionButtons.appendChild(rerollButton);
+  }
+
+  messageHeader.appendChild(actionButtons);
+
+  const messageContent = document.createElement("div");
+  messageContent.classList.add("message-content");
+  messageContent.innerHTML = renderMarkdown(content);
+
+  messageContentWrapper.appendChild(messageHeader);
+  messageContentWrapper.appendChild(messageContent);
+
+  messageElement.appendChild(messageContentWrapper);
+
+  chatMessages.appendChild(messageElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
 // Function to send a message
 function sendMessage() {
   const content = messageInput.value.trim();
@@ -402,31 +486,31 @@ function sendMessage() {
 
   if (content !== "") {
     const timestamp = new Date().toISOString();
-    db.messages
-      .add({ content, timestamp, model: selectedModel, threadId, type: "user" }) // Add the 'type' property
-      .then(() => {
-        console.log("Message sent successfully");
-        messageInput.value = "";
-        displayMessages(threadId); // Pass the thread ID to display messages
-        sendMessageToAPI(selectedModel, content);
+    db.settings
+      .get(1)
+      .then((settings) => {
+        const userAvatar = settings?.avatar || "default-avatar.png";
+        db.messages
+          .add({ content, timestamp, model: selectedModel, threadId, type: "user" })
+          .then(() => {
+            console.log("Message sent successfully");
+            messageInput.value = "";
+            appendMessage(content, "user", "User", userAvatar);
+            sendMessageToAPI(selectedModel, content);
+          })
+          .catch((error) => {
+            console.error("Error sending message:", error);
+          });
       })
       .catch((error) => {
-        console.error("Error sending message:", error);
+        console.error("Error retrieving user settings:", error);
       });
-    smoothScrollToBottom();
   }
 }
 
+
 // Event listener for the send button
 sendBtn.addEventListener("click", sendMessage);
-
-// Event listener for the Enter key press in the text input
-messageInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault(); // Prevent the default form submission behavior
-    sendMessage();
-  }
-});
 
 // Function to automatically adjust the height of the textarea
 function adjustTextareaHeight() {
@@ -435,8 +519,6 @@ function adjustTextareaHeight() {
   textarea.style.height = `${textarea.scrollHeight}px`;
 }
 
-// Event listener for input event on the textarea
-document.querySelector("#messageInput").addEventListener("input", adjustTextareaHeight);
 
 // Utility function to calculate word count
 function getWordCount(text) {
@@ -488,6 +570,8 @@ function sendMessageToAPI(model, content) {
                   const characterInstruction = character.instruction;
                   const characterReminder = character.reminder;
                   const characterInitialMessage = character.initialMessage;
+                  const characterName = character.name;
+                  const characterAvatar = character.avatar || "default-character-avatar.png";
 
                   Promise.all([
                     replacePlaceholders(characterInstruction, characterId),
@@ -508,7 +592,7 @@ function sendMessageToAPI(model, content) {
                       });
                       console.log("Conversation history:", conversationHistory);
 
- const selectedModel = models[model];
+                      const selectedModel = models[model];
                       if (selectedModel) {
                         const endpoint = selectedModel.endpoint;
                         const apiKeyField = selectedModel.apiKeyField;
@@ -546,11 +630,11 @@ function sendMessageToAPI(model, content) {
                           showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
                         }, 60000); // 60 seconds timeout
 
-console.log("Complete Request Details for " + model.toUpperCase() + ":", {
-  endpoint: endpoint,
-  apiKey: selectedModel.apiKeyPrefix + apiKey,
-  requestBody: requestBody,
-});
+                        console.log("Complete Request Details for " + model.toUpperCase() + ":", {
+                          endpoint: endpoint,
+                          apiKey: selectedModel.apiKeyPrefix + apiKey,
+                          requestBody: requestBody,
+                        });
                         fetch(endpoint, {
                           method: "POST",
                           headers: {
@@ -566,42 +650,40 @@ console.log("Complete Request Details for " + model.toUpperCase() + ":", {
                             }
                             return response.json();
                           })
-                        .then((data) => {
-  console.log(model.toUpperCase() + " API response:", data);
+                          .then((data) => {
+                            console.log(model.toUpperCase() + " API response:", data);
 
-  if (data.type === "error") {
-    console.error("Error response from " + model.toUpperCase() + " API:", data);
-    showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
-  } else {
-    const responseContent = model === 'cohere' ? data.text : selectedModel.extractResponseContent(data);
-    if (responseContent) {
-      const timestamp = new Date().toISOString();
-      conversationHistory.push({
-        role: "assistant",
-        content: responseContent,
-      });
-      console.log("Updated conversation history:", conversationHistory);
+                            if (data.type === "error") {
+                              console.error("Error response from " + model.toUpperCase() + " API:", data);
+                              showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
+                            } else {
+                              const responseContent = model === 'cohere' ? data.text : selectedModel.extractResponseContent(data);
+                              if (responseContent) {
+                                const timestamp = new Date().toISOString();
+                                conversationHistory.push({
+                                  role: "assistant",
+                                  content: responseContent,
+                                });
+                                console.log("Updated conversation history:", conversationHistory);
 
-      db.threads
-        .update(getCurrentThreadId(), { conversationHistory }) // Store the updated conversation history back to the thread
-        .then(() => {
-          db.messages
-            .add({
-              content: responseContent,
-              timestamp,
-              model,
-              threadId: getCurrentThreadId(),
-              type: "ai",
-            })
-            .then(() => {
-              displayMessages(getCurrentThreadId());
-            });
-        });
-    }
-  }
-})
-
-
+                                db.threads
+                                  .update(getCurrentThreadId(), { conversationHistory }) // Store the updated conversation history back to the thread
+                                  .then(() => {
+                                    db.messages
+                                      .add({
+                                        content: responseContent,
+                                        timestamp,
+                                        model,
+                                        threadId: getCurrentThreadId(),
+                                        type: "ai",
+                                      })
+                                      .then(() => {
+                                        appendMessage(responseContent, "ai", characterName, characterAvatar);
+                                      });
+                                  });
+                              }
+                            }
+                          })
                           .catch((error) => {
                             console.error(
                               "Error sending message to " +
@@ -645,7 +727,8 @@ console.log("Complete Request Details for " + model.toUpperCase() + ":", {
         showErrorModal("API key not found. Please make sure you have entered a valid API key for the selected model in the settings.");
       }
     });
-  smoothScrollToBottom();
+  // Remove the call to smoothScrollToBottom
+//   smoothScrollToBottom();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -936,7 +1019,11 @@ function updateModelSettings(modelName, settings) {
   }
 }
 
-// Function to display messages
+// Function to get the current thread ID
+function getCurrentThreadId() {
+  return currentThreadId || 0; // Return 0 as a default value if currentThreadId is null or undefined
+}
+
 // Function to display messages
 function displayMessages(threadId) {
   if (!threadId) {
@@ -951,11 +1038,6 @@ function displayMessages(threadId) {
     console.log("No valid threadId found.");
     chatMessages.innerHTML = "";
   }
-}
-
-// Function to get the current thread ID
-function getCurrentThreadId() {
-  return currentThreadId || 0; // Return 0 as a default value if currentThreadId is null or undefined
 }
 
 function displayMessagesForThread(threadId) {
@@ -977,16 +1059,18 @@ function displayMessagesForThread(threadId) {
                   const characterInitialMessage = character.initialMessage;
                   const characterAvatar = character.avatar || "default-character-avatar.png";
 
-                  // Replace placeholders in the initial message
                   replacePlaceholders(characterInitialMessage, character.id)
                     .then((translatedInitialMessage) => {
-                      // Clear the existing messages in the chat feed
+                      // Store the current scroll position
+                      const previousScrollTop = chatMessages.scrollTop;
+                      const previousScrollHeight = chatMessages.scrollHeight;
+
+                      // Clear the chat messages container
                       chatMessages.innerHTML = "";
 
-                        // Display the initial AI character message
-  const initialMessageElement = document.createElement("div");
-  initialMessageElement.classList.add("ai-message");
-  initialMessageElement.dataset.messageId = "initial";
+                      const initialMessageElement = document.createElement("div");
+                      initialMessageElement.classList.add("ai-message");
+                      initialMessageElement.dataset.messageId = "initial";
 
                       const avatarElement = document.createElement("img");
                       avatarElement.classList.add("message-avatar");
@@ -1007,18 +1091,16 @@ function displayMessagesForThread(threadId) {
                       const actionButtons = document.createElement("div");
                       actionButtons.classList.add("message-action-buttons");
 
-                        // Render the edit button for the initial message
-  const editButton = document.createElement("button");
-  editButton.classList.add("edit-message-btn");
-  editButton.textContent = "Edit";
-  editButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    showEditMessageModal("initial");
-  });
-  actionButtons.appendChild(editButton);
+                      const editButton = document.createElement("button");
+                      editButton.classList.add("edit-message-btn");
+                      editButton.textContent = "Edit";
+                      editButton.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        showEditMessageModal("initial");
+                      });
+                      actionButtons.appendChild(editButton);
 
-  messageHeader.appendChild(actionButtons);
-                      
+                      messageHeader.appendChild(actionButtons);
 
                       const messageContent = document.createElement("div");
                       messageContent.classList.add("message-content");
@@ -1031,7 +1113,6 @@ function displayMessagesForThread(threadId) {
 
                       chatMessages.appendChild(initialMessageElement);
 
-                      // Retrieve and append messages in the thread
                       db.messages
                         .where("threadId")
                         .equals(threadId)
@@ -1093,8 +1174,14 @@ function displayMessagesForThread(threadId) {
                             chatMessages.appendChild(messageElement);
                           });
 
-                          // Smooth scroll to the bottom of the chat feed
-                          smoothScrollToBottom();
+                          // Restore the scroll position after updating the contents
+                          if (previousScrollHeight > 0) {
+                            const newScrollHeight = chatMessages.scrollHeight;
+                            const newScrollTop = previousScrollTop + (newScrollHeight - previousScrollHeight);
+                            chatMessages.scrollTop = newScrollTop;
+                          } else {
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                          }
                         })
                         .catch((error) => {
                           console.error("Error retrieving messages for threadId:", threadId, error);
@@ -1123,25 +1210,8 @@ function displayMessagesForThread(threadId) {
     });
 }
 
-function smoothScrollToBottom() {
-  const chatMessagesContainer = document.getElementById('chatMessages');
-  const targetPosition = chatMessagesContainer.scrollHeight;
-  const startPosition = chatMessagesContainer.scrollTop;
-  const distance = targetPosition - startPosition;
-  const duration = 500; // Adjust the duration (in milliseconds) to control the scroll speed
 
-  let start = null;
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    const progress = timestamp - start;
-    chatMessagesContainer.scrollTop = startPosition + (distance * progress) / duration;
-    if (progress < duration) {
-      window.requestAnimationFrame(step);
-    }
-  }
-  window.requestAnimationFrame(step);
-}
-
+// In the chatMessages click event listener
 chatMessages.addEventListener("click", (event) => {
   if (event.target.classList.contains("edit-message-btn")) {
     const messageId = event.target.closest(".user-message, .ai-message").dataset.messageId;
@@ -1150,7 +1220,10 @@ chatMessages.addEventListener("click", (event) => {
     const messageId = event.target.closest(".user-message, .ai-message").dataset.messageId;
     deleteMessage(messageId);
   }
+  // Remove the call to smoothScrollToBottom
+ //  smoothScrollToBottom();
 });
+
 
 function showEditMessageModal(messageId) {
   const editMessageModal = document.getElementById('editMessageModal');
