@@ -67,9 +67,6 @@ Grimoire is a privacy-focused, free, and open-source front end designed specific
 ### Prompt-based Features
 - Introduce prompt-based features for roleplaying and gamification scenarios
 
-### Custom Styles
-- Offer a range of custom styles beyond the default dark mode
-
 ### Cost Tracking
 - Implement cost tracking functionality to monitor API usage
 
