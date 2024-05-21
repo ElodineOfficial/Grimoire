@@ -1,6 +1,6 @@
 const models = {
 claude: {
-  endpoint: 'https://ttalesinteractive.com/grimoire/proxy7.php',
+  endpoint: 'YOUR PROXY URL HERE',
   apiKeyField: 'x-api-key',
   apiKeyPrefix: '',
   messageField: 'prompt',
