@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Chat Application</title>
-    <link rel="stylesheet" href="/grimoire/styles.css">
+    <link rel="stylesheet" href="/grimoire/play/wurking117.css">
 </head>
 <body>
 <div class="container">
@@ -12,22 +12,23 @@
     <button id="newsBtn" class="btn">News</button> <!-- Added News button -->
   </div>
   <div class="sidebar-content">
-    <button id="landingBtn" class="btn">Landing Page</button>
-    <button id="threadsBtn" class="btn">Chat Threads</button>
+    <button id="landingBtn" class="btn">Home</button>
+    <button id="threadsBtn" class="btn">Current Thread</button>
     <button id="settingsBtn" class="btn">User Settings</button>
     <div id="threadList"></div>
   </div>
   <div class="sidebar-footer">
     <a href="https://ttalesinteractive.com/?page_id=1984" target="_blank" class="about-btn">About</a>
 	<button id="appearanceBtn" class="btn">Appearance</button>
-    <button id="purgeDataBtn" class="btn">Purge All Data</button>
+    <button id="extensionsBtn" class="btn">Extensions</button>
+    <button id="purgeDataBtn" class="btn">Delete All Data</button>
   </div>
 </div>
 
 <button id="expandSidebar" class="btn">Expand</button>
     <div class="middle-column">
-        
-<!-- Landing Page -->
+
+        <!-- Landing Page -->
 <div id="landingPage" class="landing-page">
   <h2 class="section-header">Your Characters</h2>
   <div id="characterCardsContainer">
@@ -66,6 +67,28 @@
 </div>
 
 
+<!-- Extensions Modal -->
+<div id="extensionsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeExtensionsModal()">
+            <svg xmlns="https://ttalesinteractive.com/grimoire/close.svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </span>
+        <h2>Extensions</h2>
+        <form id="extensionsForm">
+            <label for="extensionFileInput">Upload JavaScript File:</label>
+            <input type="file" id="extensionFileInput" accept=".js">
+            <label for="extensionCodeInput">Or Write JavaScript Code:</label>
+            <textarea id="extensionCodeInput" rows="10" placeholder="Write your JavaScript code here..."></textarea>
+            <button type="button" id="applyExtensionBtn" class="btn">Apply Extension</button>
+        </form>
+    </div>
+</div>
+
+
+
 <!-- Appearance Modal -->
 <div id="appearanceModal" class="modal">
     <div class="modal-content">
@@ -101,13 +124,15 @@
       </svg>
     </span>
     <h2>Latest News</h2>
-    <h2>Current Patch: 1.3</h2>
+    <h2>Current Patch: 1.5</h2>
     <div id="newsContent">
-	   <p id="stickyMessage">Hotfix: Cohere is working again. The auto scrolling bug has been fixed.</p>
+	   <p id="stickyMessage"> Patch 1.5: Model Updates [3/07/25].</p>
        <p id="welcomeMessage">Welcome to Grimoire! Here you can find the latest news and updates. Thanks for joining us, this'll look better and better as time goes on! - Eli</p>
         <select id="newsSelect" onchange="loadNewsContent()">
-        <option value="current">1.3</option>
+        <option value="current">1.5</option>
         <option value="upcoming">Upcoming Changes</option>
+		<option value="prioronedotfour">1.4</option>       
+	   <option value="prioronedotthree">1.3</option>
         <option value="prioronedottwo">1.2</option>
         <option value="prioronedotone">1.1</option>
         <option value="initialonedot">1.0</option>
@@ -262,10 +287,11 @@
     </div>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.polyfills.min.js"></script>
-    <script type="module" src="/grimoire/app.js"></script>
-    <script type="module" src="/grimoire/models.js"></script>
-    <script type="module" src="/grimoire/modelSettings.js"></script>
-    <script type="module" src="/grimoire/news12.js"></script> <!-- Added news.js script -->
-	<script type="module" src="/grimoire/appearance.js"></script>
+    <script type="module" src="/grimoire/play/app652.js"></script>
+    <script type="module" src="/grimoire/play/models105.js"></script>
+    <script type="module" src="/grimoire/play/modelSettings25.js"></script>
+    <script type="module" src="/grimoire/news15.js"></script>
+	<script type="module" src="/grimoire/play/appearance13.js"></script>
+    <script type="module" src="/grimoire/play/extensions36.js"></script>
 </body>
 </html>
