@@ -33,10 +33,10 @@ import {
   textToSpeech,
 } from "./utils.js";
 
-import models from "./models105.js";
-import modelSettings from './modelSettings25.js';
-import { renderMarkdown } from './markdown12.js';
-import starterCharacters from './starterCharacters10.js';
+import models from "./models.js";
+import modelSettings from './modelSettings.js';
+import { renderMarkdown } from './markdown.js';
+import starterCharacters from './starterCharacters.js';
 
 let db = new Dexie("GrimDBAlpha");
 db.version(95).stores({
