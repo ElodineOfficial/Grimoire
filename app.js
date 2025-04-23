@@ -33,10 +33,10 @@ import {
   textToSpeech,
 } from "./utils.js";
 
-import models from "./models.js";
-import modelSettings from './modelSettings.js';
-import { renderMarkdown } from './markdown.js';
-import starterCharacters from './starterCharacters.js';
+import models from "./models105.js";
+import modelSettings from './modelSettings25.js';
+import { renderMarkdown } from './markdown12.js';
+import starterCharacters from './starterCharacters10.js';
 
 let db = new Dexie("GrimDBAlpha");
 db.version(95).stores({
@@ -543,10 +543,11 @@ function trimConversationHistory(conversationHistory, contextLimit) {
   return trimmedHistory;
 }
 
-function sendMessageToAPI(model, content) {
+// Function to send a message to the API. Updated to accept optional threadId and isReroll flag.
+function sendMessageToAPI(model, content, threadId = getCurrentThreadId(), isReroll = false) {
   db.settings
     .get(1)
-    .then((settings) => {
+    .then(function (settings) {
       const apiKey = settings[model + "Key"];
       console.log("Using " + model.toUpperCase() + " API Key:", apiKey);
 
@@ -557,14 +558,15 @@ function sendMessageToAPI(model, content) {
       }
 
       db.threads
-        .get(getCurrentThreadId())
-        .then((thread) => {
+        .get(threadId)
+        .then(function (thread) {
           if (thread && thread.characterId) {
-            const conversationHistory = thread.conversationHistory || []; // Retrieve the conversation history from the thread
+            // Retrieve the conversation history from the thread, or initialize it as an empty array
+            const conversationHistory = thread.conversationHistory || [];
 
             db.characters
               .get(thread.characterId)
-              .then((character) => {
+              .then(function (character) {
                 if (character) {
                   const characterId = character.id;
                   const characterInstruction = character.instruction;
@@ -578,7 +580,8 @@ function sendMessageToAPI(model, content) {
                     replacePlaceholders(characterReminder, characterId),
                     replacePlaceholders(characterInitialMessage, characterId),
                   ])
-                    .then(([instruction, reminder, initialMessage]) => {
+                    .then(function ([instruction, reminder, initialMessage]) {
+                      // Seed conversation history with the initial message if it's empty.
                       if (conversationHistory.length === 0) {
                         conversationHistory.push({
                           role: "assistant",
@@ -586,10 +589,23 @@ function sendMessageToAPI(model, content) {
                         });
                       }
 
-                      conversationHistory.push({
-                        role: "user",
-                        content: `${instruction}\n\n${content}\n\n${reminder}`,
-                      });
+                      if (isReroll) {
+                        // On a reroll, remove only the last assistant message.
+                        if (
+                          conversationHistory.length > 0 &&
+                          conversationHistory[conversationHistory.length - 1].role === "assistant"
+                        ) {
+                          conversationHistory.pop();
+                        }
+                        // Do not add a new user message; use the existing one.
+                      } else {
+                        // Normal flow: add the new user message.
+                        conversationHistory.push({
+                          role: "user",
+                          content: instruction + "\n\n" + content + "\n\n" + reminder,
+                        });
+                      }
+
                       console.log("Conversation history:", conversationHistory);
 
                       const selectedModel = models[model];
@@ -604,37 +620,42 @@ function sendMessageToAPI(model, content) {
 
                         const conversationHistoryFormatted = selectedModel.formatConversationHistory(trimmedHistory, character.name);
 
-                        // Create a copy of the requestBody
-                        const requestBody = { ...selectedModel.requestBody };
-
-                        // Set the messageField in the requestBody based on the model
-                        if (model === 'claude') {
-                          requestBody['prompt'] = conversationHistoryFormatted; // Assuming conversationHistoryFormatted is the prompt
-                        } else if (model === 'gpt') {
-                          requestBody['messages'] = conversationHistoryFormatted;
-                        } else if (model === 'cohere') {
-                          requestBody['message'] = conversationHistoryFormatted.message;
-                          requestBody['chat_history'] = conversationHistoryFormatted.chat_history;
-                          requestBody['connectors'] = conversationHistoryFormatted.connectors;
+                        // Create a copy of the requestBody using transformRequestBody if available
+                        let requestBody;
+                        if (model === "gpt" && typeof selectedModel.transformRequestBody === "function") {
+                          requestBody = selectedModel.transformRequestBody();
+                        } else {
+                          requestBody = JSON.parse(JSON.stringify(selectedModel.requestBody));
                         }
 
-                        // Log the request details
+                        // Set the messageField in the requestBody based on the model
+                        if (model === "claude") {
+                          requestBody["prompt"] = conversationHistoryFormatted;
+                        } else if (model === "gpt") {
+                          requestBody["messages"] = conversationHistoryFormatted;
+                        } else if (model === "cohere") {
+                          requestBody["message"] = conversationHistoryFormatted.message;
+                          requestBody["chat_history"] = conversationHistoryFormatted.chat_history;
+                          requestBody["connectors"] = conversationHistoryFormatted.connectors;
+                        }
+
                         console.log("Request Details for " + model.toUpperCase() + ":");
                         console.log("Endpoint:", endpoint);
                         console.log("API Key Field:", apiKeyField);
                         console.log("API Key:", selectedModel.apiKeyPrefix + apiKey);
                         console.log("Request Body:", requestBody);
 
-                        const timeout = setTimeout(() => {
+                        const timeout = setTimeout(function () {
                           console.error("API request timed out after 60 seconds.");
                           showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
-                        }, 60000); // 60 seconds timeout
+                        }, 60000);
 
                         console.log("Complete Request Details for " + model.toUpperCase() + ":", {
                           endpoint: endpoint,
                           apiKey: selectedModel.apiKeyPrefix + apiKey,
                           requestBody: requestBody,
                         });
+
                         fetch(endpoint, {
                           method: "POST",
                           headers: {
@@ -643,21 +664,21 @@ function sendMessageToAPI(model, content) {
                           },
                           body: JSON.stringify(requestBody),
                         })
-                          .then((response) => {
-                            clearTimeout(timeout); // Clear the timeout if the response is received
+                          .then(function (response) {
+                            clearTimeout(timeout);
                             if (!response.ok) {
                               throw new Error(response.statusText);
                             }
                             return response.json();
                           })
-                          .then((data) => {
+                          .then(function (data) {
                             console.log(model.toUpperCase() + " API response:", data);
 
                             if (data.type === "error") {
                               console.error("Error response from " + model.toUpperCase() + " API:", data);
                               showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
                             } else {
-                              const responseContent = model === 'cohere' ? data.text : selectedModel.extractResponseContent(data);
+                              const responseContent = model === "cohere" ? data.text : selectedModel.extractResponseContent(data);
                               if (responseContent) {
                                 const timestamp = new Date().toISOString();
                                 conversationHistory.push({
@@ -667,69 +688,60 @@ function sendMessageToAPI(model, content) {
                                 console.log("Updated conversation history:", conversationHistory);
 
                                 db.threads
-                                  .update(getCurrentThreadId(), { conversationHistory }) // Store the updated conversation history back to the thread
-                                  .then(() => {
+                                  .update(threadId, { conversationHistory: conversationHistory })
+                                  .then(function () {
                                     db.messages
                                       .add({
                                         content: responseContent,
-                                        timestamp,
-                                        model,
-                                        threadId: getCurrentThreadId(),
+                                        timestamp: timestamp,
+                                        model: model,
+                                        threadId: threadId,
                                         type: "ai",
                                       })
-                                      .then(() => {
+                                      .then(function () {
                                         appendMessage(responseContent, "ai", characterName, characterAvatar);
                                       });
                                   });
                               }
                             }
                           })
-                          .catch((error) => {
-                            console.error(
-                              "Error sending message to " +
-                                model.toUpperCase() +
-                                " API:",
-                              error
-                            );
+                          .catch(function (error) {
+                            console.error("Error sending message to " + model.toUpperCase() + " API:", error);
                             showErrorModal("We had an error retrieving your message. Please check your API key and funding. If this issue persists, send this error report to Eli on Discord.");
                           });
                       } else {
                         console.error("Unsupported model:", model);
                       }
                     })
-                    .catch((error) => {
+                    .catch(function (error) {
                       console.error("Error replacing placeholders:", error);
                     });
                 } else {
-                  console.error(
-                    "Character not found for the current thread ID:",
-                    getCurrentThreadId()
-                  );
+                  console.error("Character not found for the current thread ID:", threadId);
                 }
               })
-              .catch((error) => {
+              .catch(function (error) {
                 console.error("Failed to retrieve character:", error);
               });
           } else {
-            console.error(
-              "Thread not found or character ID not set for the current thread ID:",
-              getCurrentThreadId()
-            );
+            console.error("Thread not found or character ID not set for thread ID:", threadId);
           }
         })
-        .catch((error) => {
+        .catch(function (error) {
           console.error("Failed to retrieve thread:", error);
         });
     })
-    .catch((error) => {
+    .catch(function (error) {
       console.error("Failed to retrieve API keys:", error);
       if (error.message.includes("Cannot read properties of undefined")) {
         showErrorModal("API key not found. Please make sure you have entered a valid API key for the selected model in the settings.");
       }
     });
-  // Remove the call to smoothScrollToBottom
-//   smoothScrollToBottom();
+  // Note: Removed any call to smoothScrollToBottom as per previous comments.
 }
+
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Close button functionality for error modal
@@ -745,12 +757,23 @@ let latestConsoleError = '';
 (function() {
   const originalError = console.error;
   console.error = function(...args) {
-    latestConsoleError = args.map(arg => 
-      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
-    ).join(' '); // Serialize objects to get full context
+    latestConsoleError = args.map(arg => {
+      if (arg instanceof Error) {
+        return arg.message + "\n" + arg.stack;
+      } else if (typeof arg === 'object') {
+        // If it's an object (like the one returned from the GPT API), try to include its details.
+        try {
+          return JSON.stringify(arg, null, 2);
+        } catch (e) {
+          return arg.toString();
+        }
+      }
+      return arg;
+    }).join(' ');
     originalError.apply(console, args);
   };
 })();
+
 
 // Function to show the error modal with error message and latest console error
 function showErrorModal(errorMessage) {
@@ -1387,6 +1410,12 @@ function displayCharacters() {
       characterAvatar.classList.add("character-avatar");
       characterCard.appendChild(characterAvatar);
 
+      // Add click event listener to the avatar image only within the character card
+      characterAvatar.addEventListener("click", (event) => {
+        event.stopPropagation();
+        initiateNewChatThread(character.id);
+      });
+
       const characterInfo = document.createElement("div");
       characterInfo.classList.add("character-info");
       characterCard.appendChild(characterInfo);
@@ -1396,7 +1425,7 @@ function displayCharacters() {
       characterName.classList.add("character-name");
       characterInfo.appendChild(characterName);
 
-      // Add click event listener to the character name
+      // Add click event listener to the character name (if desired)
       characterName.addEventListener("click", () => {
         initiateNewChatThread(character.id);
       });
@@ -1423,22 +1452,23 @@ function displayCharacters() {
       });
       actionButtons.appendChild(shareButton);
 
-     const deleteButton = document.createElement("button");
-deleteButton.classList.add("delete-character-btn");
-deleteButton.textContent = "Delete";
-deleteButton.addEventListener("click", (event) => {
-  event.stopPropagation();
-  deleteCharacter(character.id);
-});
-actionButtons.appendChild(deleteButton);
+      const deleteButton = document.createElement("button");
+      deleteButton.classList.add("delete-character-btn");
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        deleteCharacter(character.id);
+      });
+      actionButtons.appendChild(deleteButton);
 
       characterCardsWrapper.appendChild(characterCard);
     });
-
   }).catch(error => {
     console.error("Error retrieving characters:", error);
   });
 }
+
+
 
 
 // Function to append a "Create Character" button to the landing page
@@ -1827,7 +1857,6 @@ function updateAvatarDisplay(imgData) {
 } 
 
 chatMessages.addEventListener("click", (event) => {
-  // ...
 
   if (event.target.classList.contains("reroll-message-btn")) {
     const messageId = event.target.dataset.messageId;
@@ -1836,28 +1865,40 @@ chatMessages.addEventListener("click", (event) => {
 });
 
 function rerollMessage(messageId) {
-  db.messages.get(Number(messageId))
+  const validMessageId = Number(messageId);
+  if (isNaN(validMessageId)) {
+    console.error("Invalid message ID provided:", messageId);
+    return;
+  }
+  
+  db.messages.get(validMessageId)
     .then((message) => {
-      if (message.type === "ai") {
+      if (message && message.type === "ai") {
         const threadId = message.threadId;
         const model = message.model;
-        const content = message.content;
-
-        // Delete the old message
-        db.messages.delete(Number(messageId))
-          .then(() => {
-            // Send the same request to the API
-            sendMessageToAPI(model, content, threadId, true);
+        db.threads.get(threadId)
+          .then((thread) => {
+            if (thread && thread.conversationHistory) {
+              const history = thread.conversationHistory;
+              // Always assume a hidden message exists at index 0.
+              // Then the user message for the assistant response is at history.length - 3.
+              if (history.length >= 3) {
+                const originalUserMessage = history[history.length - 3].content;
+                sendMessageToAPI(model, originalUserMessage, threadId, true);
+              } else {
+                console.error("Conversation history too short for reroll.");
+              }
+            }
           })
-          .catch((error) => {
-            console.error("Error deleting message:", error);
-          });
+          .catch((error) => console.error("Error retrieving thread:", error));
       }
     })
     .catch((error) => {
       console.error("Error retrieving message:", error);
     });
 }
+
+
 
 
 toggleSidebar.addEventListener('click', () => {
