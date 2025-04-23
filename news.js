@@ -28,6 +28,15 @@ const newsContent = {
         </ul>
     `,
     current: `
+        <h3> 1.4: Current Patch Notes</h3>
+        <ul>
+			<li>Color-scheme shift.</li>
+			<li>Borders added.</li>
+            <li>Mobile functionality cleaned up.</li>
+            <li>Visibility issues fixed.</li>
+        </ul>
+    `,
+		prioronedotthree: `
         <h3> 1.3: Current Patch Notes</h3>
         <ul>
 			<li>Appearance tab added.</li>
