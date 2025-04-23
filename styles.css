@@ -1,16 +1,25 @@
 :root {
   --primary-color: #2c2c2c;
-  --secondary-color: #444444;
+  --secondary-color: #151515;
   --text-color: #ffffff;
   --padding: 20px;
   --border-radius: 15px;
+  --border: 7px;
+  --border-color: #bf9864;
   --font-size: 14px;
   --font-size-secondary: 18px;
+  --chat-messages-text-color: #ffffff;
+  --chat-messages-text-size: 14px;
+  --chat-messages-background-color: #1e1e1e;
+  --chat-messages-position: relative;
 }
 
 /* Mobile-specific root styles */
 @media (max-width: 1000px) {
   :root {
+	--primary-color: #2c2c2c;
+    --secondary-color: #151515;
+    --text-color: #ffffff;
     --padding: 15px;
     --border-radius: 12px;
     --font-size: 28px;
@@ -58,13 +67,14 @@ body {
 }
 
 .left-column {
+  background-color: #1e1e1e;
   display: flex;
   flex-direction: column;
   width: 300px;
-  background-color: #2c2c2c;
   padding: 5px;
-  border-right: 1px solid #444444;
-  height: 100vh;
+  padding-top: 10px;
+  border-right: 1px solid #151515;
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -76,21 +86,36 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Mobile-specific styles using media query */
 @media (max-width: 1000px) {
   .left-column {
-    width: 700px;
+      display: flex;
+  flex-direction: column;
+  width: 160%;
+  padding-top: 2%;
+  border-right: 1px solid #151515;
+  height: 99.9vh;
+  max-height: 100%;
+  min-height: 100%;
+  padding-bottom: 150px;
   }
 }
 
 
 .sidebar-header {
   display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap to the next line */
   justify-content: space-between;
   align-items: center;
+  gap: 10px; /* Optional: Add spacing between the buttons */
   padding-bottom: 10px;
-  border-bottom: 1px solid #444444;
-  margin-bottom: 20px;
+  padding-top: 10px;
+  border-bottom: 1px solid #151515;
+  margin-bottom: 10px;
+  padding-left: 7px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #151515;
+  margin-bottom: 10px;
+  
 }
 
 .sidebar-header .btn {
@@ -134,16 +159,37 @@ body {
   left: 60px;
   z-index: 1;
   padding: 10px 20px;
-  background-color: #007bff;
+ 
+  background-color: #1D3938;
   color: #fff;
   text-decoration: none;
   border-radius: 4px;
-  border: none;
   cursor: pointer;
 }
 
+/* Mobile-specific styles for #expandSidebar */
+@media (max-width: 1000px) {
+  #expandSidebar {
+  padding-top: 2%; /* Adjust top padding for mobile */
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 15px;
+  z-index: 1;
+  padding: 10px 20px;
+ 
+  background-color: #1D3938;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  }
+}
+
+
 #expandSidebar:hover {
-  background-color: #0056b3;
+  background-color: black;
+  color: white;
 }
 
 .left-column.collapsed + #expandSidebar {
@@ -151,11 +197,14 @@ body {
 }
 
 .sidebar-content {
+  flex-grow: 1;
+  flex-wrap: wrap; /* Allow buttons to wrap to the next line */
   padding-top: 20px;
   padding-left: 7px;
   font-size: var(--font-size-secondary);
+  overflow-y: auto;
+  background-color: #1e1e1e;
 }
-
 
 .left-column.collapsed .btn {
   display: none;
@@ -180,14 +229,24 @@ body {
   background-color: #333333;
   border-radius: 5px;
   cursor: pointer;
-  border: 1px solid #444444;
+  border: 1px solid rgb(191, 152, 100);
   font-size: var(--font-size);
 }
 
-.thread-avatar {  width: 50px;
-  height: 50px;
+.thread-avatar {  width: 60px;
+  height: 60px;
   border-radius: 50%;
   margin-right: 10px;
+  border: 1px solid var(--border-color);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 1000px) {
+.thread-avatar {  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
 }
 
 .thread-info {
@@ -196,19 +255,34 @@ body {
   flex-direction: column;
   min-width: 0;
   padding: 0.5rem;
-  background-color: #444444;
+  background-color: #151515;
   border-radius: 5px;
   border: 1px solid #555555;
   cursor: pointer;
   position: relative;
   user-select: none;
   margin-right: 10px;
- font-size: var(--font-size);
+  font-size: var(--font-size);
 }
 
 .thread-info:hover {
   background-color: #555555;
 }
+
+/* Mobile-specific styles */
+@media (max-width: 1000px) {
+  .thread-info {
+    font-size: calc(var(--font-size) * 1.2); /* Increase text size for mobile */
+    padding: 1rem; /* Add more padding for better spacing */
+    margin-right: 0; /* Remove extra margin to center-align if needed */
+    text-align: center; /* Optional: Center-align text for better readability */
+  }
+
+  .thread-info:hover {
+    background-color: #666666; /* Slightly brighter hover for mobile */
+  }
+}
+
 
 .character-name,
 .thread-id {
@@ -219,8 +293,18 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0.25rem 0;
-  font-size: 18px; /* Change to --font-size */
+  font-size: var(--font-size); /* Use a variable for easy customization */
 }
+
+/* Mobile-specific styles */
+@media (max-width: 1000px) {
+  .character-name,
+  .thread-id {
+    font-size: calc(var(--font-size) * 1.2); /* Increase font size for mobile */
+    padding: 0.5rem 0; /* Add more padding for touch-friendliness */
+  }
+}
+
 
 .thread-actions {
   display: flex;
@@ -228,7 +312,7 @@ body {
 }
 
 .thread:hover {
-  background-color: #444444;
+  background-color: #151515;
 }
 
 .sidebar-header {
@@ -236,48 +320,53 @@ body {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
-  border-bottom: 1px solid #444444;
-  margin-bottom: 20px;
+  padding-top: 10px;
+  border-bottom: 1px solid #151515;
+  margin-bottom: 10px;
   padding-left: 7px;
+  background-color: #1e1e1e;
 }
 
-.sidebar-content {
-  flex-grow: 1;
-  overflow-y: auto;
-  margin-bottom: 20px;
-}
 
 .sidebar-footer {
+  background-color: #1e1e1e;
+  flex-wrap: wrap; /* Allow buttons to wrap to the next line */
+  align-items: center;
+  gap: 10px; /* Optional: Add spacing between the buttons */
+  padding-bottom: 10px;
   padding-top: 10px;
-  border-top: 1px solid #444444;
+  border-bottom: 1px solid #151515;
+  margin-bottom: 10px;
   padding-left: 7px;
 }
+
+
 
 .left-column.collapsed .sidebar-footer {
   visibility: hidden;
 }
 
-.sidebar-content {
-  flex-grow: 1;
-  padding-top: 20px;
-  font-size: var(--font-size-secondary);
-  overflow-y: auto;
-}
-
 .about-btn {
-  display: inline-block;
-  padding: 8px 16px;
-  background-color: #222222;
-  color: #ffffff;
+  z-index: 1;
+  background-color: #1D3938;
+  color: #fff;
   text-decoration: none;
   border-radius: 4px;
-  transition: background-color 0.3s;
-  font-size: var(--font-size);
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  border: 1px solid rgb(191, 152, 100);
+  font-size: var(--font-size-secondary);
 }
 
+
+
 .about-btn:hover {
-  background-color: #777777;
+  background-color: black;
+  color: white;
 }
+
 
   .about-btn {
     font-size: var(--font-size-secondary);
@@ -292,19 +381,24 @@ body {
 
 /* Button styles */
 .btn {
-  display: inline-block;
-  padding: 5px 10px;
-  background-color: #007bff;
+  z-index: 1;
+  border: 1px solid rgb(191, 152, 100);
+  background-color: #1D3938;
   color: #fff;
   text-decoration: none;
   border-radius: 4px;
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 4px;
   margin-bottom: 10px;
-  border: none;
   font-size: var(--font-size-secondary);
 }
 
+
+
 .btn:hover {
-  background-color: #0056b3;
+  background-color: black;
+  color: white;
 }
 
 .section-header {
@@ -327,44 +421,42 @@ body {
 /* Mobile-specific styles */
 @media (max-width: 1000px) {
   #landingPage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-#characterCardsContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, 280px);
   grid-gap: 0.5rem;
   justify-content: center;
   font-size: var(--font-size);
+  padding-left: 100px; 
+}
+}
+
+#characterCardsContainer, #exampleCharactersContainer  {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 280px);
+  grid-gap: 0.5rem;
+  padding-left: 20%;
+  font-size: var(--font-size);
+  width: 100%; 
 }
 
 /* Mobile-specific styles */
 @media (max-width: 1000px) {
-  #characterCardsContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  #characterCardsContainer, #exampleCharactersContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); /* Reduce the minmax value */
+  grid-gap: 0.5rem;
+  font-size: var(--font-size);
+}
 }
 
 /* Style settings for character containers */
 .character-cards-wrapper, #exampleCharactersContainer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Reduce the minmax value */
-  grid-gap: 0.5rem;
   justify-content: center;
-  font-size: var(--font-size);
   padding-left: 250px; 
-}
-
-/* Mobile-specific styles */
-@media (max-width: 1000px) {
-  .character-cards-wrapper, #exampleCharactersContainer {
-    padding-left: 0px;
-  }
+  grid-gap: 0.5rem;
+  font-size: var(--font-size);
 }
 
 .character-card {
@@ -378,16 +470,9 @@ body {
   height: 150px;
   overflow: hidden;
   color: #FFFFFF;
+  border: 3px solid var(--border-color);
 }
 
-/* Mobile-specific styles */
-@media (max-width: 1000px) {
-  .character-card {
-    width: 100%; /* Make the card width fill the container */
-    height: 250px; /* Increase the height to 200px */
-    padding: 15px; /* Reduce the padding for smaller screens */
-  }
-}
 
 .character-cards-wrapper, #exampleCharactersContainer {
   display: grid;
@@ -397,11 +482,10 @@ body {
   font-size: var(--font-size);
 }
 
-
-
 /* Ensuring a three column layout on desktop for both containers */
 @media (min-width: 1000px) {
   .character-cards-wrapper, #exampleCharactersContainer {
+	  justify-content: center;
     grid-template-columns: repeat(3, 1fr); /* Creates 3 columns when the screen is wide */
   }
 }
@@ -409,12 +493,21 @@ body {
 /* Mobile-specific styles */
 @media (max-width: 1000px) {
   .character-cards-wrapper, #exampleCharactersContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; /* Switch to flex layout for single-row alignment */
+	padding-right: 90%;
+	padding-left: 0px;
+    flex-direction: column; /* Stack items vertically */
+    gap: 1rem; /* Add space between rows */
+    width: 500px; /* Ensure the container spans full width */
   }
+
   .character-card {
-    width: 100%; /* Makes the cards stretch to the full container width on mobile */
+    width: 500px; /* Each card takes up 70% of the page width */
+    height: auto; /* Flexible height */
+    margin: 0 auto; /* Center each card horizontally */
+    padding: 15px; /* Add padding for a sleek look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for styling */
+    border-radius: 10px; /* Round corners for modern style */
   }
 }
 
@@ -425,6 +518,18 @@ body {
   height: 100%;
   font-size: var(--font-size);
   width: 100%;
+  
+}
+
+@media (max-width: 1000px) {
+.current-chat {
+  display: none; /* Ensure it's also none by default */
+  flex-direction: column;
+  height: 100%;
+  font-size: var(--font-size);
+  width: 100%;
+ padding-bottom: 25%  
+}
 }
 
 .middle-column {
@@ -454,8 +559,8 @@ body {
   background-color: #2c2c2c;
   border-radius: 4px;
   text-align: center;
-  border: 1px solid #444444;
-   font-size: var(--font-size);
+  border: 1px solid rgb(191, 152, 100);
+  font-size: var(--font-size);
 }
 
 /* Chat threads styles */
@@ -486,7 +591,7 @@ body {
   background-color: #2c2c2c;
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid #444444;
+  border: 1px solid rgb(191, 152, 100);
   width: 300px;
   font-size: var(--font-size);
   position: relative; /* Add this line */
@@ -507,9 +612,9 @@ body {
   width: 100%;
   padding: 5px;
   margin-bottom: 10px;
-  background-color: #444444;
+  background-color: #151515;
   color: #ffffff;
-  border: none;
+  border: 1px solid rgb(191, 152, 100);
   font-size: var(--font-size);
 }
 
@@ -545,7 +650,7 @@ body {
 .delete-thread-btn,
 .share-character-btn,
 .delete-character-btn {
-  background-color: #007bff;
+  background-color: #1D3938;
   color: #FFFFFF;
   padding: 5px 10px;
   cursor: pointer;
@@ -553,14 +658,15 @@ body {
   font-size: var(--font-size);
   font-weight: bold;
   text-decoration: underline;
+  border: 1px solid var(--border-color);
 }
 
 .edit-character-btn:hover,
 .delete-thread-btn:hover,
 .share-character-btn:hover,
 .delete-character-btn:hover {
-  background-color: #000000;
-  color: #007bff;
+  background-color: black;
+  color: white;
 }
 
 .share-character-btn,
@@ -569,18 +675,29 @@ body {
 }
 
 .character-avatar {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 1px solid var(--border-color);
+}
+
+@media (max-width: 1000px) {
+.character-avatar {
+  width:100px;
+  height: 100px;
   border-radius: 50%;
   margin-right: 10px;
 }
+}
+
 
 /* Character Card Modal */
 .modal-content textarea {
   width: 100%;
   padding: 5px;
   margin-bottom: 10px;
-  background-color: #444444;
+  background-color: #151515;
   color: #ffffff;
   border: none;
 }
@@ -612,13 +729,13 @@ body {
 
 @media (max-width: 1000px) {
   .close {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
   }
 
   .close svg {
-    width: 20px;
-    height: 20px;
+    width: 50px;
+    height: 50px;
   }
 }
 
@@ -627,9 +744,9 @@ body {
   width: 100%;
   padding: 5px;
   margin-bottom: 10px;
-  background-color: #444444;
+  background-color: #151515;
   color: #ffffff;
-  border: none;
+  border: 1px solid rgb(191, 152, 100);
 }
 
 .close {
@@ -653,8 +770,11 @@ body {
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  font-size: var(--font-size-secondary);
   max-height: calc(100vh - 160px); /* Ensuring it doesn't exceed the viewport */
+  color: var(--chat-messages-text-color);
+  font-size: var(--chat-messages-text-size);
+  background-color: var(--chat-messages-background-color);
+  position: var(--chat-messages-position);
 }
 
 
@@ -728,9 +848,10 @@ body {
 
 .user-message .message-avatar,
 .ai-message .message-avatar {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
+  border: 1px solid var(--border-color);
 }
 
 .user-message .message-avatar {
@@ -747,7 +868,7 @@ body {
   align-items: center;
   padding: 20px;
   background-color: #2c2c2c;
-  border-top: 1px solid #444444;
+  border-top: 1px solid #151515;
 }
 
 .message-input textarea {
@@ -756,30 +877,47 @@ body {
   min-height: 60px;
   max-height: 200px;
   margin-right: 10px;
-  background-color: #444444;
+  background-color: #151515;
   color: #ffffff;
-  border: none;
+  border: 1px solid rgb(191, 152, 100);
   padding: 10px;
   border-radius: 5px;
-  font-size: var(--font-size);
+  font-size: 16px !important; /* Force a minimum font size */
   line-height: 1.4;
   overflow-y: auto;
   font-family: Arial, sans-serif;
+  -webkit-appearance: none;
+  -webkit-text-size-adjust: none;
+  touch-action: manipulation;
 }
+
+/* Mobile-specific styles for #messageInput */
+@media (max-width: 1000px) {
+  .message-input textarea {
+    min-height: 150px; /* Adjusted for better usability on mobile */
+    max-height: 300px; /* Set a maximum height to prevent overflow */
+    font-size: 38px !important; /* Ensure font size stays large */
+    padding: 15px; /* Add more padding for touch-friendly input */
+    line-height: 1.5; /* Improve text spacing */
+    border-radius: 10px; /* Aesthetic touch for rounded corners */
+    overflow-y: auto; /* Ensure scrolling works for longer inputs */
+  }
+}
+
 
 .message-input select,
 .message-input button {
   margin-right: 10px;
-  background-color: #444444;
+  background-color: #151515;
   color: #ffffff;
-  border: none;
+  border: 1px solid rgb(191, 152, 100);
   padding: 10px;
   border-radius: 5px;
   font-size: var(--font-size);
 }
 
 .message-input button {
-  background-color: #007bff;
+  background-color: #1D3938;
   cursor: pointer;
 }
 
@@ -816,24 +954,25 @@ body {
   }
 }
 
+
+/* Desktop and General Styles */
 .edit-message-btn,
-.delete-message-btn,
-.reroll-message-btn {
+.delete-message-btn {
   padding: 5px 10px;
   font-size: var(--font-size);
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
 .edit-message-btn {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #1D3938;
+  color: #FFFFFF;
 }
 
 .edit-message-btn:hover {
-  background-color: #0056b3;
+  background-color: black;
+  color: white;
 }
 
 .delete-message-btn {
@@ -842,8 +981,38 @@ body {
 }
 
 .delete-message-btn:hover {
-  background-color: #b02a37;
+  background-color: black;
+  color: white;
 }
+
+/* Mobile-specific styles */
+@media (max-width: 1000px) {
+  .edit-message-btn,
+  .delete-message-btn {
+    background-color: inherit; /* Ensure no inherited styles interfere */
+  }
+
+  .edit-message-btn {
+    background-color: #1D3938 !important; /* Apply blue background explicitly */
+    color: #FFFFFF !important; /* Apply white text explicitly */
+  }
+
+  .delete-message-btn {
+    background-color: #dc3545 !important; /* Apply red background explicitly */
+    color: #FFFFFF !important; /* Apply white text explicitly */
+  }
+
+  .edit-message-btn:hover {
+  background-color: black;
+  color: white;
+}
+
+  .delete-message-btn:hover {
+    background-color: #b02a37 !important; /* Red hover effect */
+  }
+}
+
+
 
 .reroll-message-btn {
   background-color: #28a745;
@@ -854,15 +1023,6 @@ body {
   background-color: #1e7e34;
 }
 
-/* Mobile-specific styles */
-@media (max-width: 1000px) {
-  .edit-message-btn,
-  .delete-message-btn,
-  .reroll-message-btn {
-    padding: 4px 8px;
-	font-size: var(--font-size);
-  }
-}
 
 blockquote {
   color: #6495ED;
@@ -877,7 +1037,7 @@ blockquote {
   margin-top: 10px;
   padding: 10px;
   background: #f9f9f9;
-  border: 1px solid #ddd;
+  border: 1px solid rgb(191, 152, 100);
   border-radius: 4px;
   font-family: monospace;
   white-space: pre-wrap;
@@ -888,7 +1048,7 @@ blockquote {
   padding: 5px 10px;
   background: #444; /* Dark grey background */
   color: #fff;
-  border: none;
+  border: 1px solid rgb(191, 152, 100);
   border-radius: 4px;
   cursor: pointer;
 }
@@ -903,9 +1063,85 @@ blockquote {
   margin-top: 10px;
   padding: 10px;
   background: #222; /* Darker grey background */
-  border: 1px solid #555; /* Dark grey border */
+  border: 1px solid rgb(191, 152, 100);
   border-radius: 4px;
   font-family: monospace;
   white-space: pre-wrap;
   color: #ddd; /* Light grey text */
+}
+
+/* General styling for all select dropdown menus */
+select {
+  width: 250px%;
+  padding: 10px;
+  font-size: var(--font-size);
+  background-color: #151515;
+  color: #ffffff;
+  border: 1px solid rgb(191, 152, 100);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  appearance: none; /* Remove default styling for consistency */
+}
+
+@media (max-width: 1000px) {
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 35px;
+  background-color: #151515;
+  color: #ffffff;
+  border: 1px solid rgb(191, 152, 100);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  appearance: none; /* Remove default styling for consistency */
+}
+}
+
+/* Specific styling for #cssClassSelect */
+#cssClassSelect {
+  width: 20%; /* Adjust width if needed for the specific select */
+  margin-bottom: 20px; /* Optional margin for spacing */
+}
+
+
+/* Hover and focus styles for desktop */
+select:hover {
+  background-color: #555555;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
+}
+
+/* General styling for #extensionCodeInput */
+#extensionCodeInput {
+  width: 100%;
+  padding: 10px;
+  font-size: var(--font-size);
+  background-color: #151515;
+  color: #ffffff;
+  border: 1px solid rgb(191, 152, 100);
+  border-radius: var(--border-radius);
+  outline: none;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover and focus effects */
+#extensionCodeInput:hover {
+  background-color: #555555;
+}
+
+#extensionCodeInput:focus {
+  background-color: #666666;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 1000px) {
+  #extensionCodeInput {
+    font-size: var(--font-size-secondary); /* Larger font for better readability */
+    padding: 15px; /* More padding for touch-friendly input */
+    border-radius: 12px; /* Slightly larger border-radius for modern design */
+  }
 }
